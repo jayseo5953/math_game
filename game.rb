@@ -1,10 +1,10 @@
 require './player'
 require './question'
 class Game
-  attr_accessor :player1, :player2, :current_player, :waiting_player
-  @@turn = true
-  def initialize
-    register
+  attr_accessor :player1, :player2, :current_player, :waiting_player, :questions
+  
+  def initialize(questions_db)
+    @questions = questions_db
   end
 
   def register
@@ -20,18 +20,12 @@ class Game
     @waiting_player = player2
   end
 
-  def play (question_db)
-    if (@@turn)
-      current_player = player1
-      waiting_player = player2
-    else
-      current_player = player2
-      waiting_player = player1
-    end
-   
-    q = Question.new(question_db)
-    question = q.question
-    puts "\n#{current_player.name}'s turn,\nHere is the question:\n#{question}"
+ 
+  def play
+
+    q = Question.new(questions)
+  
+    puts "\n#{current_player.name}'s turn,\nHere is the question:\n#{q.ask}"
 
     ans = gets.chomp.to_i
 
@@ -43,7 +37,7 @@ class Game
       if (current_player.still_alive?)
         puts "#{player1.name}'s life: #{player1.life}"
         puts "#{player2.name}'s life: #{player2.life}"
-        @@turn = !@@turn
+       
         puts "\n----- NEW TURN -----"
       else
         puts ""
@@ -60,8 +54,11 @@ class Game
       puts "\nCORRECT!!!" 
       puts "#{player1.name}'s life: #{player1.life}"
       puts "#{player2.name}'s life: #{player2.life}"
-      @@turn = !@@turn
+     
       puts "\n----- NEW TURN -----"
     end
+    swap_current = current_player
+    self.current_player = waiting_player
+    self.waiting_player = swap_current
   end
 end
